@@ -63,7 +63,7 @@ usage() {
 
 check() {   # This is not a complete, but only a limited sanity check of the inputs
     case $argv1 in
-        fresh|still|daily|3.*|4.*|5.*|6.*|7.*)
+        fresh|still)
             # Do nothing, accepted!
             echo -e "\nBuilding LibreOffice AppImage from \"${argv1}\" channel or release:"
             ;;
@@ -75,19 +75,7 @@ check() {   # This is not a complete, but only a limited sanity check of the inp
             exit 0
             ;;
     esac
-    case $argv2 in
-        x86|x86-64)
-            # Do nothing, accepted!
-            echo "    -- for architecture \"${argv2}\";"
-            ;;
-        *)
-            echo "==> Wrong or unsupported architecture ${argv2} in argument no.2 -- must be 'x86' or 'x86-64'. <=="
-            echo "For correct usage of ${argv0} please see below:"
-            echo ""
-            usage
-            exit 0
-            ;;
-    esac
+    argv="x86-64"
     case $argv3 in
         standard|full)
             echo "    -- with localization language(es) \"${argv3}\";"
@@ -153,46 +141,9 @@ check() {   # This is not a complete, but only a limited sanity check of the inp
             echo "    -- include offline help language(s) \"${argv4}\";"
             ;;
     esac
-    case $argv5 in
-        Y|N)
-            # Do nothing, accepted!
-            echo "    -- include AppImage zsync updatability feature = \"${argv5}\";"
-            ;;
-        *)
-            echo "==> Wrong argument ${argv5} at position no.5! (Must be either 'Y' or 'N' to include update functions or not... <=="
-            echo "For correct usage of ${argv0} please see below:"
-            echo ""
-            usage
-            exit 0
-            ;;
-    esac
-    case $argv6 in
-        Y|N)
-            # Do nothing, accepted!
-            echo "    -- with signature for package = \"${argv6}\";"
-            ;;
-        *)
-            echo "==> Wrong argument ${argv6} at position no. 6! (Must be either 'Y' or 'N' to include a signature or not... <=="
-            echo "For correct usage of ${argv0} please see below:"
-            echo ""
-            usage
-            exit 0
-            ;;
-    esac
-
-    case $argv7 in
-        Y|N)
-            # Do nothing, accepted!
-            echo "    -- with portable for package = \"${argv7}\";"
-            ;;
-        *)
-            echo "==> Wrong argument ${argv7} at position no. 7! (Must be either 'Y' or 'N' to include portable function or not... <=="
-            echo "For correct usage of ${argv0} please see below:"
-            echo ""
-            usage
-            exit 0
-            ;;
-    esac
+    argv5="Y"
+    argv6="Y"
+    argv7="Y"
 }
 
 # Check number of arguments:
