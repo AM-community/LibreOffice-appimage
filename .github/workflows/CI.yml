@@ -22,7 +22,7 @@ jobs:
         sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
 
         URL="https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage"
-        wget -c "$URL" -O appimagetool
+        wget -c "$URL" -O appimagetool && chmod a+x ./appimagetool
         export PATH="$PWD":"${PATH}"
         
         chmod a+x ./make_libreoffice_appimage
