@@ -386,15 +386,15 @@ set +x
 
 if [[ $language == "N" ]] ; then
 	if [[ $optHelp != "N" ]] ; then
-		VERSION="$nrVersion"."help" appimagetool -u "gh-releases-zsync|$GITHUB_REPOSITORY_OWNER|LibreOffice-appimage|continuous-$pathVersion|*$argv3*.help-$ARCH.AppImage.zsync" -v ./$APP.AppDir/
+		VERSION="$pathVersion-$nrVersion"."help" appimagetool -u "gh-releases-zsync|$GITHUB_REPOSITORY_OWNER|LibreOffice-appimage|continuous-$pathVersion|*$argv3*.help-$ARCH.AppImage.zsync" -v ./$APP.AppDir/
 	else
-		VERSION="$nrVersion" appimagetool -u "gh-releases-zsync|$GITHUB_REPOSITORY_OWNER|LibreOffice-appimage|continuous-$pathVersion|*$argv3*-$ARCH.AppImage.zsync" -v ./$APP.AppDir/
+		VERSION="$pathVersion-$nrVersion" appimagetool -u "gh-releases-zsync|$GITHUB_REPOSITORY_OWNER|LibreOffice-appimage|continuous-$pathVersion|*$argv3*-$ARCH.AppImage.zsync" -v ./$APP.AppDir/
 	fi
 else
 	if [[ $optHelp != "N" ]] ; then
-		VERSION="$nrVersion"."$language"."help" appimagetool -u "gh-releases-zsync|$GITHUB_REPOSITORY_OWNER|LibreOffice-appimage|continuous-$pathVersion|*$argv3*.help-$ARCH.AppImage.zsync" -v ./$APP.AppDir/
+		VERSION="$pathVersion-$nrVersion"."$language"."help" appimagetool -u "gh-releases-zsync|$GITHUB_REPOSITORY_OWNER|LibreOffice-appimage|continuous-$pathVersion|*$argv3*.help-$ARCH.AppImage.zsync" -v ./$APP.AppDir/
 	else
-		VERSION="$nrVersion"."$language" appimagetool -u "gh-releases-zsync|$GITHUB_REPOSITORY_OWNER|LibreOffice-appimage|continuous-$pathVersion|*$argv3*-$ARCH.AppImage.zsync" -v ./$APP.AppDir/
+		VERSION="$pathVersion-$nrVersion"."$language" appimagetool -u "gh-releases-zsync|$GITHUB_REPOSITORY_OWNER|LibreOffice-appimage|continuous-$pathVersion|*$argv3*-$ARCH.AppImage.zsync" -v ./$APP.AppDir/
 	fi
 fi
 
