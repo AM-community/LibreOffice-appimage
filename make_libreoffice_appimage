@@ -162,13 +162,13 @@ esac
 
 declare -A master_builds
 
-function todate() {
+todate() {
 	# change the date to Unix timestamp
 	local datestring="TZ=\"UTC\" ${1}"
 	date -d "$datestring" +%s
 }
 
-function newestmaster() {
+newestmaster() {
 	# Compare the dates as timestamps to find the newest one
 	# Access associative array with a name reference
 	# Key is relative path to file, value is date
@@ -182,7 +182,7 @@ function newestmaster() {
 	echo "$filepath"
 }
 
-function filtermasters() {
+filtermasters() {
 	# Read a page listing the actually available builds
 	local current_masters=$(wget -q "https://dev-builds.libreoffice.org/daily/master/current.html" -O -)
 	# Put all the Linux build links into an array, but filter out any debug or rpm archives
@@ -258,13 +258,13 @@ elif [[ $pathVersion == *"daily"* ]] ; then
 	nrVersion=$tmpVersion"_"$tmpDate
 else
 	if [[ $pathVersion == "3."* ]] ; then
-	nrVersion=$libreVersion
-	path="https://downloadarchive.documentfoundation.org/libreoffice/old/$pathVersion/deb/${pathArch}/"
-	package="LibO_${nrVersion}_Linux_${arch}_install-deb_en-US.tar.gz"
+		nrVersion=$libreVersion
+		path="https://downloadarchive.documentfoundation.org/libreoffice/old/$pathVersion/deb/${pathArch}/"
+		package="LibO_${nrVersion}_Linux_${arch}_install-deb_en-US.tar.gz"
 	else
 		nrVersion=$libreVersion
-	path="https://downloadarchive.documentfoundation.org/libreoffice/old/${nrVersion}/deb/${pathArch}/"
-	package="LibreOffice_${nrVersion}_Linux_${arch}_deb.tar.gz"
+		path="https://downloadarchive.documentfoundation.org/libreoffice/old/${nrVersion}/deb/${pathArch}/"
+		package="LibreOffice_${nrVersion}_Linux_${arch}_deb.tar.gz"
 	fi
 fi
 
@@ -365,11 +365,7 @@ fi
 
 find . -name startcenter.desktop -exec cp \{\} . \;
 
-if [[ $pathVersion == *"daily"* ]] ; then
-	sed -i -e 's|Name=.*|Name=LibreOfficeDev|g' startcenter.desktop
-else
-	sed -i -e 's|Name=.*|Name=LibreOffice|g' startcenter.desktop
-fi
+sed -i -e 's|Name=.*|Name=LibreOffice|g' startcenter.desktop
 
 find . -name "*startcenter.png" -path "*hicolor*48x48*" -exec cp \{\} . \;
 
@@ -386,22 +382,32 @@ chmod a+x AppRun
 
 cd ..
 
-URL="https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-${appimageArch}.AppImage"
-wget -c "$URL" -O appimagetool
-chmod a+x ./appimagetool
+_appimagetool() {
+	if ! command -v appimagetool 1>/dev/null; then
+		if [ ! -f ./appimagetool ]; then
+			echo " Downloading appimagetool..."
+			wget -c "$URL" -O appimagetool
+			chmod a+x ./appimagetool
+		fi
+		./appimagetool "$@"
+	else
+		appimagetool "$@"
+	fi
+}
+
 set +x
 
 if [[ $language == "N" ]] ; then
 	if [[ $optHelp != "N" ]] ; then
-		VERSION="$pathVersion"."help" ./appimagetool -u "gh-releases-zsync|$GITHUB_REPOSITORY_OWNER|LibreOffice-appimage|$pathVersion|*.help.AppImage.zsync" -v ./$APP.AppDir/
+		VERSION="$pathVersion"."help" _appimagetool -u "gh-releases-zsync|$GITHUB_REPOSITORY_OWNER|LibreOffice-appimage|$pathVersion|*.help.AppImage.zsync" -v ./$APP.AppDir/
 	else
-		VERSION="$pathVersion" ./appimagetool -u "gh-releases-zsync|$GITHUB_REPOSITORY_OWNER|LibreOffice-appimage|$pathVersion|*.AppImage.zsync" -v ./$APP.AppDir/
+		VERSION="$pathVersion" _appimagetool -u "gh-releases-zsync|$GITHUB_REPOSITORY_OWNER|LibreOffice-appimage|$pathVersion|*.AppImage.zsync" -v ./$APP.AppDir/
 	fi
 else
 	if [[ $optHelp != "N" ]] ; then
-		VERSION="$pathVersion"."$language"."help" ./appimagetool -u "gh-releases-zsync|$GITHUB_REPOSITORY_OWNER|LibreOffice-appimage|$pathVersion|*.help.AppImage.zsync" -v ./$APP.AppDir/
+		VERSION="$pathVersion"."$language"."help" _appimagetool -u "gh-releases-zsync|$GITHUB_REPOSITORY_OWNER|LibreOffice-appimage|$pathVersion|*.help.AppImage.zsync" -v ./$APP.AppDir/
 	else
-		VERSION="$pathVersion"."$language" ./appimagetool -u "gh-releases-zsync|$GITHUB_REPOSITORY_OWNER|LibreOffice-appimage|$pathVersion|*.AppImage.zsync" -v ./$APP.AppDir/
+		VERSION="$pathVersion"."$language" _appimagetool -u "gh-releases-zsync|$GITHUB_REPOSITORY_OWNER|LibreOffice-appimage|$pathVersion|*.AppImage.zsync" -v ./$APP.AppDir/
 	fi
 fi
 
