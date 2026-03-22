@@ -384,19 +384,16 @@ cd ..
 
 set +x
 
-if [[ $language == "N" ]] ; then
-	if [[ $optHelp != "N" ]] ; then
-		VERSION="$pathVersion-$nrVersion"."help" appimagetool -u "gh-releases-zsync|$GITHUB_REPOSITORY_OWNER|LibreOffice-appimage|continuous-$pathVersion|*$argv3*.help-$ARCH.AppImage.zsync" -v ./$APP.AppDir/
-	else
-		VERSION="$pathVersion-$nrVersion" appimagetool -u "gh-releases-zsync|$GITHUB_REPOSITORY_OWNER|LibreOffice-appimage|continuous-$pathVersion|*$argv3*-$ARCH.AppImage.zsync" -v ./$APP.AppDir/
-	fi
+if [[ $optHelp != "N" ]] ; then
+	variant="$language.help"
 else
-	if [[ $optHelp != "N" ]] ; then
-		VERSION="$pathVersion-$nrVersion"."$language"."help" appimagetool -u "gh-releases-zsync|$GITHUB_REPOSITORY_OWNER|LibreOffice-appimage|continuous-$pathVersion|*$argv3*.help-$ARCH.AppImage.zsync" -v ./$APP.AppDir/
-	else
-		VERSION="$pathVersion-$nrVersion"."$language" appimagetool -u "gh-releases-zsync|$GITHUB_REPOSITORY_OWNER|LibreOffice-appimage|continuous-$pathVersion|*$argv3*-$ARCH.AppImage.zsync" -v ./$APP.AppDir/
-	fi
+	variant="$language"
 fi
+
+UPINFO="gh-releases-zsync|$GITHUB_REPOSITORY_OWNER|$REPO|continuous-$pathVersion|*$pathVersion*$variant-$ARCH.AppImage.zsync"
+FILENAME="LibreOffice-$pathVersion-$nrVersion-$variant-$ARCH.AppImage "
+
+ARCH=x86_64 appimagetool -u "$UPINFO" ./squashfs-root "$FILENAME"
 
 set -x
 
