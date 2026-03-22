@@ -21,179 +21,179 @@ argv7="${7}"
 everylang="af|am|ar|as|ast|be|bg|bn-IN|bn|bo|br|brx|bs|ca-valencia|ca|cs|cy|da|de|dgo|dz|el|en-GB|en-ZA|eo|es|et|eu|fa|fi|fr|ga|gd|gl|gu|gug|he|hi|hr|hsb|hu|id|is|it|ja|ka|kk|km|kmr|kn|ko|kok|ks|lb|lo|lt|lv|mai|mk|ml|mn|mni|mr|my|nb|ne|nl|nn|nr|nso|oc|om|or|pa-IN|pl|pt-BR|pt|qtz|ro|ru|rw|sa-IN|sat|sd|si|sid|sk|sl|sq|sr-Latn|sr|ss|st|sv|sw-TZ|ta|te|tg|th|tn|tr|ts|tt|ug|uk|uz|ve|vec|vi|xh|zh-CN|zh-TW|zu"
 # Describe usage:
 usage() {
-    echo ""
-    echo " Build an \"single-file\" AppImage executable for any (arbitrary) version of LibreOffice from The Document Foundation's official binary Debian package."
-    echo ""
-    echo " Usage:  ${argv0}  <version>  <arch>  <lang>  <help-yesno>  <zsync-yesno>  <sign-yesno> <portable-yesno>"
-    echo ""
-    echo "   where:"
-    echo "             <version>: 'fresh':   build from 'fresh' release channel (i.e. the latest official release)"
-    echo "                        'still':   build from 'still' release channel (i.e. the previous official release)"
-    echo "                        'daily':   build from 'daily' release channel (i.e. the current hot-of-the-stove development branch)"
-    echo "                      'n.m.o.p':   for example use '5.4.3.2'"
-    echo ""
-    echo "             <arch>:      'x86':   package 32-bit binaries"
-    echo "                       'x86-64':   package 64-bit binaries"
-    echo ""
-    echo "             <lang>: 'standard':   includes en-GB, it, ar, zh-CN, zh-TW, fr, de, ja, ko, pt, pt-BR, es, ru language-packs"
-    echo "                         'full':   includes all available language-packs (for some releases more than 113 different ones!)"
-    echo "                            'N':   no extra language-pack (LibreOffice comes with default 'en-US')"
-    echo "                       <custom>:   includes one or more comma separated language-packs (for example 'de' or 'it,es')"
-    echo ""
-    echo "             <help-yesno>:  'Y' or 'N' (Yes/No to include online help for each language pack installed for the previous '<lang>' parameter)"
-    echo "                       <custom>:   includes help for one or more comma separated languages (for example 'de' or 'it,es')"
-    echo ""
-    echo "             <zsync-yesno>: 'Y' or 'N' (Yes/No to include capability for updating the AppImage with the help of 'AppImageUpdate')"
-    echo ""
-    echo "             <sign-yesno>:  'Y' or 'N' (Yes/No to include a GPG signature)"
-    echo ""
-    echo "             <portable-yesno>: 'Y' or 'N' (Yes/No to include portable function)"
-    echo ""
-    echo "   Example:  \"${argv0} still x86-64 it N N N N\""
-    echo "             Build LO AppImage package with Italian language-pack, without offline help, not auto-updateable, without signing the package, ."
-    echo ""
-    echo "   Example:  \"${argv0} daily x86-64 de Y Y N\""
-    echo "             Build LO AppImage package (development version) with German language-pack, with (German) offline help, updateable via zsync, without signing the package."
-    echo ""
-    echo "   Example:  \"${argv0} 3.5.7.2 x86-64 es Y N N\""
-    echo "             Build LO v3.5.7.2 AppImage package with Spanish language-pack, with (Spanish) offline help, not auto-updateable, without signing the package."
-    echo ""
+	echo ""
+	echo " Build an \"single-file\" AppImage executable for any (arbitrary) version of LibreOffice from The Document Foundation's official binary Debian package."
+	echo ""
+	echo " Usage:  ${argv0}  <version>  <arch>  <lang>  <help-yesno>  <zsync-yesno>  <sign-yesno> <portable-yesno>"
+	echo ""
+	echo "   where:"
+	echo "			 <version>: 'fresh':   build from 'fresh' release channel (i.e. the latest official release)"
+	echo "						'still':   build from 'still' release channel (i.e. the previous official release)"
+	echo "						'daily':   build from 'daily' release channel (i.e. the current hot-of-the-stove development branch)"
+	echo "					  'n.m.o.p':   for example use '5.4.3.2'"
+	echo ""
+	echo "			 <arch>:	  'x86':   package 32-bit binaries"
+	echo "					   'x86-64':   package 64-bit binaries"
+	echo ""
+	echo "			 <lang>: 'standard':   includes en-GB, it, ar, zh-CN, zh-TW, fr, de, ja, ko, pt, pt-BR, es, ru language-packs"
+	echo "						 'full':   includes all available language-packs (for some releases more than 113 different ones!)"
+	echo "							'N':   no extra language-pack (LibreOffice comes with default 'en-US')"
+	echo "					   <custom>:   includes one or more comma separated language-packs (for example 'de' or 'it,es')"
+	echo ""
+	echo "			 <help-yesno>:  'Y' or 'N' (Yes/No to include online help for each language pack installed for the previous '<lang>' parameter)"
+	echo "					   <custom>:   includes help for one or more comma separated languages (for example 'de' or 'it,es')"
+	echo ""
+	echo "			 <zsync-yesno>: 'Y' or 'N' (Yes/No to include capability for updating the AppImage with the help of 'AppImageUpdate')"
+	echo ""
+	echo "			 <sign-yesno>:  'Y' or 'N' (Yes/No to include a GPG signature)"
+	echo ""
+	echo "			 <portable-yesno>: 'Y' or 'N' (Yes/No to include portable function)"
+	echo ""
+	echo "   Example:  \"${argv0} still x86-64 it N N N N\""
+	echo "			 Build LO AppImage package with Italian language-pack, without offline help, not auto-updateable, without signing the package, ."
+	echo ""
+	echo "   Example:  \"${argv0} daily x86-64 de Y Y N\""
+	echo "			 Build LO AppImage package (development version) with German language-pack, with (German) offline help, updateable via zsync, without signing the package."
+	echo ""
+	echo "   Example:  \"${argv0} 3.5.7.2 x86-64 es Y N N\""
+	echo "			 Build LO v3.5.7.2 AppImage package with Spanish language-pack, with (Spanish) offline help, not auto-updateable, without signing the package."
+	echo ""
 }
 
 
 check() {   # This is not a complete, but only a limited sanity check of the inputs
-    case $argv1 in
-        fresh|still)
-            # Do nothing, accepted!
-            echo -e "\nBuilding LibreOffice AppImage from \"${argv1}\" channel or release:"
-            ;;
-        *)
-            echo -e "\n  ==> Argument no.1 must be either 'fresh', 'still', 'daily' or a specific LibreOffice version number released by The Document Foundation. <=="
-            echo "For correct usage of ${argv0} please see below:"
-            echo ""
-            usage
-            exit 0
-            ;;
-    esac
-    argv="x86-64"
-    case $argv3 in
-        standard|full)
-            echo "    -- with localization language(es) \"${argv3}\";"
-            ;;
-        N)
-            echo "    -- without any extra localization language;"
-            ;;
-        "$everylang")
-            echo "    -- with localization language \"${argv3}\";"
-            ;;
-        *)
-            if [ -z "$argv3" ]
-            then
-                echo "==> Wrong or unsupported language request '${argv3}' in argument no.3. <=="
-                echo "For correct usage of ${argv0} please see below:"
-                echo ""
-                usage
-                exit 0
-            fi
-            for lang in ${argv3//,/ }
-            do
-                for available in ${everylang//|/ }
-                do
-                    [ "$lang" = "$available" ] && continue 2
-                done
-                echo "==> Wrong or unsupported language request '${lang}' in argument no.3. <=="
-                echo "For correct usage of ${argv0} please see below:"
-                echo ""
-                usage
-                exit 0
-            done
-            echo "    -- with localization language(s) \"${argv3}\";"
-            ;;
-    esac
-    case $argv4 in
-        Y|N)
-            # Do nothing, accepted!
-            echo "    -- include offline help = \"${argv4}\";"
-            ;;
-        *)
-            if [ -z "$argv4" ]
-            then
-                echo "==> Wrong or unsupported help language request '${argv4}' in argument no.4. <=="
-                echo "==> Must be either 'Y', 'N' or a comma separated list of languages to include <=="
-                echo "For correct usage of ${argv0} please see below:"
-                echo ""
-                usage
-                exit 0
-            fi
-            for helplang in ${argv4//,/ }
-            do
-                for available in ${everylang//|/ }
-                do
-                    [ "$helplang" = "$available" ] && continue 2
-                done
-                echo "==> Wrong or unsupported help language request '${helplang}' in argument no.4. <=="
-                echo "==> Must be either 'Y', 'N' or a comma separated list of languages to include <=="
-                echo "For correct usage of ${argv0} please see below:"
-                echo ""
-                usage
-                exit 0
-            done
-            echo "    -- include offline help language(s) \"${argv4}\";"
-            ;;
-    esac
-    argv5="Y"
-    argv6="Y"
-    argv7="Y"
+	case $argv1 in
+		fresh|still)
+			# Do nothing, accepted!
+			echo -e "\nBuilding LibreOffice AppImage from \"${argv1}\" channel or release:"
+			;;
+		*)
+			echo -e "\n  ==> Argument no.1 must be either 'fresh', 'still', 'daily' or a specific LibreOffice version number released by The Document Foundation. <=="
+			echo "For correct usage of ${argv0} please see below:"
+			echo ""
+			usage
+			exit 0
+			;;
+	esac
+	argv="x86-64"
+	case $argv3 in
+		standard|full)
+			echo "	-- with localization language(es) \"${argv3}\";"
+			;;
+		N)
+			echo "	-- without any extra localization language;"
+			;;
+		"$everylang")
+			echo "	-- with localization language \"${argv3}\";"
+			;;
+		*)
+			if [ -z "$argv3" ]
+			then
+				echo "==> Wrong or unsupported language request '${argv3}' in argument no.3. <=="
+				echo "For correct usage of ${argv0} please see below:"
+				echo ""
+				usage
+				exit 0
+			fi
+			for lang in ${argv3//,/ }
+			do
+				for available in ${everylang//|/ }
+				do
+					[ "$lang" = "$available" ] && continue 2
+				done
+				echo "==> Wrong or unsupported language request '${lang}' in argument no.3. <=="
+				echo "For correct usage of ${argv0} please see below:"
+				echo ""
+				usage
+				exit 0
+			done
+			echo "	-- with localization language(s) \"${argv3}\";"
+			;;
+	esac
+	case $argv4 in
+		Y|N)
+			# Do nothing, accepted!
+			echo "	-- include offline help = \"${argv4}\";"
+			;;
+		*)
+			if [ -z "$argv4" ]
+			then
+				echo "==> Wrong or unsupported help language request '${argv4}' in argument no.4. <=="
+				echo "==> Must be either 'Y', 'N' or a comma separated list of languages to include <=="
+				echo "For correct usage of ${argv0} please see below:"
+				echo ""
+				usage
+				exit 0
+			fi
+			for helplang in ${argv4//,/ }
+			do
+				for available in ${everylang//|/ }
+				do
+					[ "$helplang" = "$available" ] && continue 2
+				done
+				echo "==> Wrong or unsupported help language request '${helplang}' in argument no.4. <=="
+				echo "==> Must be either 'Y', 'N' or a comma separated list of languages to include <=="
+				echo "For correct usage of ${argv0} please see below:"
+				echo ""
+				usage
+				exit 0
+			done
+			echo "	-- include offline help language(s) \"${argv4}\";"
+			;;
+	esac
+	argv5="Y"
+	argv6="Y"
+	argv7="Y"
 }
 
 # Check number of arguments:
 case $# in
-    7)
-        check
-        ;;
-    0|1|2|3|4|5|6|*)
-        echo "==> Wrong number of arguments! (Used: ${#}) <=="
-        echo "For correct usage of ${argv0} please see below:"
-        echo ""
-        usage
-        exit 0
-        ;;
+	7)
+		check
+		;;
+	0|1|2|3|4|5|6|*)
+		echo "==> Wrong number of arguments! (Used: ${#}) <=="
+		echo "For correct usage of ${argv0} please see below:"
+		echo ""
+		usage
+		exit 0
+		;;
 esac
 
 declare -A master_builds
 
 function todate() {
-    # change the date to Unix timestamp
-    local datestring="TZ=\"UTC\" ${1}"
-    date -d "$datestring" +%s
+	# change the date to Unix timestamp
+	local datestring="TZ=\"UTC\" ${1}"
+	date -d "$datestring" +%s
 }
 
 function newestmaster() {
-    # Compare the dates as timestamps to find the newest one
-    # Access associative array with a name reference
-    # Key is relative path to file, value is date
-    local -n ar=$1
-    local max=0
-    local filepath=""
-    for i in "${!ar[@]}" ; do
-        timestamp=$(todate "${ar[$i]}")
-        (("$timestamp" > max)) && max="$timestamp" && filepath="$i"
-    done
-    echo "$filepath"
+	# Compare the dates as timestamps to find the newest one
+	# Access associative array with a name reference
+	# Key is relative path to file, value is date
+	local -n ar=$1
+	local max=0
+	local filepath=""
+	for i in "${!ar[@]}" ; do
+		timestamp=$(todate "${ar[$i]}")
+		(("$timestamp" > max)) && max="$timestamp" && filepath="$i"
+	done
+	echo "$filepath"
 }
 
 function filtermasters() {
-    # Read a page listing the actually available builds
-    local current_masters=$(wget -q "https://dev-builds.libreoffice.org/daily/master/current.html" -O -)
-    # Put all the Linux build links into an array, but filter out any debug or rpm archives
-    mapfile -t master_links < <( grep -oP -e '<a href="\.\/Linux.*</a>' <<< "$current_masters" | grep -vE 'dbg|rpm\.tar\.gz' )
-    # Add relative file paths and dates into an associative array
-    for link in "${master_links[@]}"; do
-        key=$(grep -oP -e '(?<=<a href="\.\/)Linux.*(?=">)' <<< "$link")
-        value=$(grep -oP -e "(?<=<a href=\"\.\/${key}\">).*(?=<\/a>)" <<< "$link")
-        master_builds[$key]=$value
-    done
-    newestmaster master_builds
+	# Read a page listing the actually available builds
+	local current_masters=$(wget -q "https://dev-builds.libreoffice.org/daily/master/current.html" -O -)
+	# Put all the Linux build links into an array, but filter out any debug or rpm archives
+	mapfile -t master_links < <( grep -oP -e '<a href="\.\/Linux.*</a>' <<< "$current_masters" | grep -vE 'dbg|rpm\.tar\.gz' )
+	# Add relative file paths and dates into an associative array
+	for link in "${master_links[@]}"; do
+		key=$(grep -oP -e '(?<=<a href="\.\/)Linux.*(?=">)' <<< "$link")
+		value=$(grep -oP -e "(?<=<a href=\"\.\/${key}\">).*(?=<\/a>)" <<< "$link")
+		master_builds[$key]=$value
+	done
+	newestmaster master_builds
 }
 
 pathVersion=$1
@@ -206,33 +206,27 @@ optPortable="${7:-Y}"
 gpgPass=""
 
 if [[ $language == *"standard"* ]] ; then
-    languages=(en-GB it ar zh-CN zh-TW fr de ja ko pt pt-BR es ru)
+	languages=(en-GB it ar zh-CN zh-TW fr de ja ko pt pt-BR es ru)
 elif [[ $language == *"full"* ]] ; then
-    languages=(${everylang//|/ })
+	languages=(${everylang//|/ })
 elif [[ $language != "N" ]] ; then
-    languages=(${argv3//,/ })
-        # avoid long language lists in VERSION; and commas like in "fr,de"
-        # cause "LibreOffice-$VERSION.AppImage --appimage-mount" to fail
-    [ "${#languages[@]}" -le 4 ] && language="${language//,/_}" || language="custom"
+	languages=(${argv3//,/ })
+		# avoid long language lists in VERSION; and commas like in "fr,de"
+		# cause "LibreOffice-$VERSION.AppImage --appimage-mount" to fail
+	[ "${#languages[@]}" -le 4 ] && language="${language//,/_}" || language="custom"
 else
-    languages=()
+	languages=()
 fi
 
 if [[ $optHelp == *"Y"* ]] ; then
-    helplanguages=("${languages[@]}")
+	helplanguages=("${languages[@]}")
 elif [[ $optHelp != "N" ]] ; then
-    helplanguages=(${argv4//,/ })
+	helplanguages=(${argv4//,/ })
 else
-    helplanguages=()
+	helplanguages=()
 fi
 
-if [[ $arch == *"x86-64"* ]] ; then
-    pathArch="x86_64"
-    appimageArch="x86_64"
-elif [[ $arch == "x86" ]] ; then
-	pathArch="x86"
-	appimageArch="i686"
-fi
+ARCH="x86_64"
 
 APP=LibreOffice
 
@@ -241,31 +235,25 @@ libreVersion=$pathVersion
 set +e
 
 if [[ $pathVersion == *"fresh"* ]] ; then
-    nrVersion=$(curl "https://www.libreoffice.org/download/download-libreoffice/" | grep -o -e "/stable/.*/" | cut -d "/" -f 3 | head -n 1)
-    path="https://download.documentfoundation.org/libreoffice/stable/${nrVersion}/deb/${pathArch}/"
-    package="LibreOffice_${nrVersion}_Linux_${arch}_deb.tar.gz"
+	nrVersion=$(curl "https://www.libreoffice.org/download/download-libreoffice/" | grep -o -e "/stable/.*/" | cut -d "/" -f 3 | head -n 1)
+	path="https://download.documentfoundation.org/libreoffice/stable/${nrVersion}/deb/${pathArch}/"
+	package="LibreOffice_${nrVersion}_Linux_${arch}_deb.tar.gz"
 elif [[ $pathVersion == *"still"* ]] ; then
-    nrVersion=$(curl "https://www.libreoffice.org/download/download-libreoffice/" | grep -o -e "/stable/.*/" | cut -d "/" -f 3 | head -n 3 | tail -n 1)
-    path="https://download.documentfoundation.org/libreoffice/stable/${nrVersion}/deb/${pathArch}/"
-    package="LibreOffice_${nrVersion}_Linux_${arch}_deb.tar.gz"
+	nrVersion=$(curl "https://www.libreoffice.org/download/download-libreoffice/" | grep -o -e "/stable/.*/" | cut -d "/" -f 3 | head -n 3 | tail -n 1)
+	path="https://download.documentfoundation.org/libreoffice/stable/${nrVersion}/deb/${pathArch}/"
+	package="LibreOffice_${nrVersion}_Linux_${arch}_deb.tar.gz"
 elif [[ $pathVersion == *"daily"* ]] ; then
-    path="https://dev-builds.libreoffice.org/daily/master/"
-    package=$(filtermasters)
-    # construct a string for the appimage file name
-    # that looks like 7.3.0.0.alpha1_2021-10-31
-    [[ $package =~ .+LibreOfficeDev_(.+)_Linux_x86-64_deb\.tar\.gz ]] && tmpVersion="${BASH_REMATCH[1]}"
-    [[ $package =~ [0-9]{4}-[0-9]{2}-[0-9]{2} ]] && tmpDate="${BASH_REMATCH[0]}"
-    nrVersion=$tmpVersion"_"$tmpDate
+	path="https://dev-builds.libreoffice.org/daily/master/"
+	package=$(filtermasters)
+	# construct a string for the appimage file name
+	# that looks like 7.3.0.0.alpha1_2021-10-31
+	[[ $package =~ .+LibreOfficeDev_(.+)_Linux_x86-64_deb\.tar\.gz ]] && tmpVersion="${BASH_REMATCH[1]}"
+	[[ $package =~ [0-9]{4}-[0-9]{2}-[0-9]{2} ]] && tmpDate="${BASH_REMATCH[0]}"
+	nrVersion=$tmpVersion"_"$tmpDate
 else
-    if [[ $pathVersion == "3."* ]] ; then
 	nrVersion=$libreVersion
-	path="https://downloadarchive.documentfoundation.org/libreoffice/old/$pathVersion/deb/${pathArch}/"
-	package="LibO_${nrVersion}_Linux_${arch}_install-deb_en-US.tar.gz"
-    else
-        nrVersion=$libreVersion
 	path="https://downloadarchive.documentfoundation.org/libreoffice/old/${nrVersion}/deb/${pathArch}/"
 	package="LibreOffice_${nrVersion}_Linux_${arch}_deb.tar.gz"
-    fi
 fi
 
 LibODownloadLink=$path$package
@@ -278,77 +266,62 @@ if [[ $optHelp != "N" ]] ; then
    	 fi
 else
 	 if [[ $language != "N" ]] ; then
-           VERSION="${nrVersion}.$language"
+		   VERSION="${nrVersion}.$language"
 	 else
-	   VERSION=$nrVersion
+	   VERSION="$nrVersion"
 	 fi
 fi
 
-mkdir -p ./$APP/$APP.AppDir
-cd ./$APP || exit
+mkdir -p ./"$APP"/"$APP".AppDir
+cd ./"$APP" || exit
 
 wget -c "$LibODownloadLink"
 
 if [[ $language != "N" ]] ; then
-    if [[ $pathVersion == *"daily"* ]] ; then
-        langStart="${package%.tar.gz}_langpack_"
-    else
-        langStart="LibreOffice_${nrVersion}_Linux_${arch}_deb_langpack_"
-    fi
-    if [[ $language == *"standard"* || $language == *"full"* ]] ; then
-        for element in ${languages[*]}; do
-            langPackage="$langStart$element.tar.gz"
-            wget -c "$path$langPackage"
-        done
-    else
-        if [[ $pathVersion == "3."* ]] ; then
-            for element in ${languages[*]}; do
-                langPackage="LibO_${nrVersion}_Linux_${arch}_langpack-deb_${element}.tar.gz"
-                wget -c "$path$langPackage"
-            done
-        else
-            for element in ${languages[*]}; do
-                langPackage="$langStart${element}.tar.gz"
-                wget -c "$path$langPackage"
-            done
-        fi
-    fi
+	langStart="LibreOffice_${nrVersion}_Linux_${arch}_deb_langpack_"
+	if [[ $language == *"standard"* || $language == *"full"* ]] ; then
+		for element in ${languages[*]}; do
+			langPackage="$langStart$element.tar.gz"
+			wget -c "$path$langPackage"
+		done
+	else
+		for element in ${languages[*]}; do
+			langPackage="$langStart${element}.tar.gz"
+			wget -c "$path$langPackage"
+		done
+	fi
 fi
 
 if [[ $optHelp != "N" ]] ; then
-    if [[ $pathVersion == *"daily"* ]] ; then
-        helpStart="${package%.tar.gz}_helppack_"
-    else
-        helpStart="LibreOffice_${nrVersion}_Linux_${arch}_deb_helppack_"
-    fi
-    if [[ $language == *"standard"* || $language == *"full"* ]] ; then
-         for element in ${helplanguages[*]}; do
-            helpPackage="$helpStart$element.tar.gz"
-            wget -c "$path$helpPackage"
-         done
-    else
-        if [[ $pathVersion == "3."* ]] ; then
-            if [[ "${#helplanguages[@]}" != "0" ]] ; then
-                for element in ${helplanguages[*]}; do
-                    helpPackage="LibO_${nrVersion}_Linux_${arch}_helppack-deb_${element}.tar.gz"
-                    wget -c "$path$helpPackage"
-                done
-            else
-                helpPackage="LibO_${nrVersion}_Linux_${arch}_helppack-deb_en-US.tar.gz"
-                wget -c "$path$helpPackage"
-            fi
-        else
-            if [[ "${#helplanguages[@]}" != "0" ]] ; then
-                for element in ${helplanguages[*]}; do
-                    helpPackage="$helpStart${element}.tar.gz"
-                    wget -c "$path$helpPackage"
-                done
-            else
-                helpPackage="${helpStart}en-US.tar.gz"
-                wget -c "$path$helpPackage"
-            fi
-        fi
-    fi
+	helpStart="LibreOffice_${nrVersion}_Linux_${arch}_deb_helppack_"
+	if [[ $language == *"standard"* || $language == *"full"* ]] ; then
+		 for element in ${helplanguages[*]}; do
+			helpPackage="$helpStart$element.tar.gz"
+			wget -c "$path$helpPackage"
+		 done
+	else
+		if [[ $pathVersion == "3."* ]] ; then
+			if [[ "${#helplanguages[@]}" != "0" ]] ; then
+				for element in ${helplanguages[*]}; do
+					helpPackage="LibO_${nrVersion}_Linux_${arch}_helppack-deb_${element}.tar.gz"
+					wget -c "$path$helpPackage"
+				done
+			else
+				helpPackage="LibO_${nrVersion}_Linux_${arch}_helppack-deb_en-US.tar.gz"
+				wget -c "$path$helpPackage"
+			fi
+		else
+			if [[ "${#helplanguages[@]}" != "0" ]] ; then
+				for element in ${helplanguages[*]}; do
+					helpPackage="$helpStart${element}.tar.gz"
+					wget -c "$path$helpPackage"
+				done
+			else
+				helpPackage="${helpStart}en-US.tar.gz"
+				wget -c "$path$helpPackage"
+			fi
+		fi
+	fi
 fi
 
 for i in *.tar.gz; do tar xfvz "$i"; done
@@ -359,17 +332,13 @@ find ../ -name "*.deb" -exec dpkg -x \{\} . \;
 
 if [[ $optPortable != "N" ]] ; then
 
-     find . -type f -iname "bootstraprc" -exec sed -i "s|^UserInstallation=.*|UserInstallation=\$SYSUSERCONFIG/libreoffice/$nrVersion|g" {} +
+	 find . -type f -iname "bootstraprc" -exec sed -i "s|^UserInstallation=.*|UserInstallation=\$SYSUSERCONFIG/libreoffice/$nrVersion|g" {} +
 
 fi
 
 find . -name startcenter.desktop -exec cp \{\} . \;
 
-if [[ $pathVersion == *"daily"* ]] ; then
-    sed -i -e 's|Name=.*|Name=LibreOfficeDev|g' startcenter.desktop
-else
-    sed -i -e 's|Name=.*|Name=LibreOffice|g' startcenter.desktop
-fi
+sed -i -e 's|Name=.*|Name=LibreOffice|g' startcenter.desktop
 
 find . -name "*startcenter.png" -path "*hicolor*48x48*" -exec cp \{\} . \;
 
@@ -381,27 +350,35 @@ rm ./"$BINARY"
 find ../../opt -name soffice -path "*program*" -exec ln -s \{\} ./"$BINARY" \;
 cd ../../
 
-wget -c https://github.com/AppImage/AppImageKit/releases/download/continuous/AppRun-$appimageArch -O AppRun
+wget -c https://github.com/AppImage/AppImageKit/releases/download/continuous/AppRun-$ARCH -O AppRun
 chmod a+x AppRun
 
 cd ..
 
-URL="https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-${appimageArch}.AppImage"
-wget -c "$URL" -O appimagetool
-chmod a+x ./appimagetool
+_appimagetool() {
+	if ! command -v appimagetool 1>/dev/null; then
+		if [ ! -f ./appimagetool ]; then
+			echo " Downloading appimagetool..." && curl -#Lo appimagetool https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-"$ARCH".AppImage && chmod a+x ./appimagetool || exit 1
+		fi
+		./appimagetool "$@"
+	else
+		appimagetool "$@"
+	fi
+}
+
 set +x
 
 if [[ $language == "N" ]] ; then
 	if [[ $optHelp != "N" ]] ; then
-		VERSION="$pathVersion"."help" ./appimagetool -u "gh-releases-zsync|$GITHUB_REPOSITORY_OWNER|LibreOffice-appimage|$pathVersion|*.help.AppImage.zsync" -v ./$APP.AppDir/
+		VERSION="$pathVersion"."help" _appimagetool -u "gh-releases-zsync|$GITHUB_REPOSITORY_OWNER|LibreOffice-appimage|$pathVersion|*.help.AppImage.zsync" -v ./$APP.AppDir/
 	else
-		VERSION="$pathVersion" ./appimagetool -u "gh-releases-zsync|$GITHUB_REPOSITORY_OWNER|LibreOffice-appimage|$pathVersion|*.AppImage.zsync" -v ./$APP.AppDir/
+		VERSION="$pathVersion" _appimagetool -u "gh-releases-zsync|$GITHUB_REPOSITORY_OWNER|LibreOffice-appimage|$pathVersion|*.AppImage.zsync" -v ./$APP.AppDir/
 	fi
 else
 	if [[ $optHelp != "N" ]] ; then
-		VERSION="$pathVersion"."$language"."help" ./appimagetool -u "gh-releases-zsync|"$linkZsync$APP"-"$pathVersion"."$language".help.AppImage.zsync" -v ./$APP.AppDir/
+		VERSION="$pathVersion"."$language"."help" _appimagetool -u "gh-releases-zsync|$GITHUB_REPOSITORY_OWNER|LibreOffice-appimage|$pathVersion|*.help.AppImage.zsync" -v ./$APP.AppDir/
 	else
-		VERSION="$pathVersion"."$language" ./appimagetool -u "gh-releases-zsync|"$linkZsync$APP"-"$pathVersion"."$language".AppImage.zsync" -v ./$APP.AppDir/
+		VERSION="$pathVersion"."$language" _appimagetool -u "gh-releases-zsync|$GITHUB_REPOSITORY_OWNER|LibreOffice-appimage|$pathVersion|*.AppImage.zsync" -v ./$APP.AppDir/
 	fi
 fi
 
@@ -410,6 +387,3 @@ set -x
 if [[ $optSignature == "Y" ]] ; then
 	for i in $(find . -name "*.AppImage*" -print;); do gpg2 -b --batch --armor --passphrase "$gpgPass" "${i}"; done || true
 fi
-
-mkdir -p ../out/ || true
-mv *.AppImage* ../out/
