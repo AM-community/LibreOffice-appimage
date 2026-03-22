@@ -393,7 +393,7 @@ fi
 UPINFO="gh-releases-zsync|$GITHUB_REPOSITORY_OWNER|$REPO|continuous-$pathVersion|*$pathVersion*$variant-$ARCH.AppImage.zsync"
 FILENAME="LibreOffice-$pathVersion-$nrVersion-$variant-$ARCH.AppImage "
 
-ARCH=x86_64 appimagetool -u "$UPINFO" ./squashfs-root "$FILENAME"
+ARCH=x86_64 appimagetool -u "$UPINFO" ./$APP.AppDir/ "$FILENAME"
 
 set -x
 
