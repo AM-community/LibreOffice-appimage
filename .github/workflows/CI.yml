@@ -27,6 +27,7 @@ jobs:
            cd ..
         done
         mkdir -p dist
+        find . -type d -name out
         mv ./*/*AppImage* dist/
 
     - name: Upload artifact
