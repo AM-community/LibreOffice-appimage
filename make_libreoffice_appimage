@@ -330,6 +330,8 @@ else
 	done
 fi
 
+[ ! -f AppRun ] && wget -c https://github.com/AppImage/AppImageKit/releases/download/continuous/AppRun-$appimageArch -O AppRun && chmod a+x AppRun
+
 cd "$APP".AppDir/ || exit 1
 
 find ../*deb/ -name "*.deb" -exec dpkg -x \{\} . \;
@@ -365,8 +367,7 @@ rm ./"$BINARY"
 find ../../opt -name soffice -path "*program*" -exec ln -s \{\} ./"$BINARY" \;
 cd ../../ || exit 1
 
-[ ! -f AppRun ] && wget -c https://github.com/AppImage/AppImageKit/releases/download/continuous/AppRun-$appimageArch -O AppRun
-chmod a+x AppRun
+cp ../AppRun ./AppRun
 
 cd .. || exit 1
 
