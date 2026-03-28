@@ -10,7 +10,43 @@ on:
 
 jobs:
   build:
+    name: Build ${{ matrix.flag }}
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - language: en-GB
+            flag: "🇬🇧"
+          - language: it
+            flag: "🇮🇹"
+          - language: ar
+            flag: "🇸🇦"
+          - language: zh-CN
+            flag: "🇨🇳"
+          - language: zh-TW
+            flag: "🇹🇼"
+          - language: fr
+            flag: "🇫🇷"
+          - language: de
+            flag: "🇩🇪"
+          - language: ja
+            flag: "🇯🇵"
+          - language: ko
+            flag: "🇰🇷"
+          - language: pt
+            flag: "🇵🇹"
+          - language: pt-BR
+            flag: "🇧🇷"
+          - language: es
+            flag: "🇪🇸"
+          - language: ru
+            flag: "🇷🇺"
+          - language: standard
+            flag: "🌐"
+          - language: full
+            flag: "🌐"
+
     steps:
     - uses: actions/checkout@v6
 
@@ -26,11 +62,11 @@ jobs:
         export PATH="$PWD":"${PATH}"
         
         chmod a+x ./make_libreoffice_appimage
-        languages="en-GB it ar zh-CN zh-TW fr de ja ko pt pt-BR es ru standard full"
-        for l in $languages; do
-          ./make_libreoffice_appimage still x86-64 "$l" N Y Y Y
-          ./make_libreoffice_appimage still x86-64 "$l" Y Y Y Y
-        done
+        
+        # Build both N and Y variants
+        ./make_libreoffice_appimage still x86-64 "${{ matrix.language }}" N Y Y Y
+        ./make_libreoffice_appimage still x86-64 "${{ matrix.language }}" Y Y Y Y
+        
         mkdir -p dist
         find . -type d -name out
         mv ./*/*AppImage* dist/
@@ -38,7 +74,7 @@ jobs:
     - name: Upload artifact
       uses: actions/upload-artifact@v4.4.0
       with:
-        name: AppImage
+        name: AppImage-${{ matrix.language }}
         path: 'dist'
         
   release:

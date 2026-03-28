@@ -10,13 +10,239 @@ env:
 
 jobs:
   build:
-    name: Build ${{ matrix.language }}
+    name: Build ${{ matrix.flag }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       max-parallel: 8
       matrix:
-        language: [en-GB, it, ar, zh-CN, zh-TW, fr, de, ja, ko, pt, pt-BR, es, ru, af, am, as, ast, be, bg, bn-IN, bn, bo, br, brx, bs, ca-valencia, ca, cs, cy, da, dgo, dz, el, en-ZA, eo, et, eu, fa, fi, ga, gd, gl, gu, gug, he, hi, hr, hsb, hu, id, is, ka, kk, km, kmr, kn, kok, ks, lb, lo, lt, lv, mai, mk, ml, mn, mni, mr, my, nb, ne, nl, nn, nr, nso, oc, om, or, pa-IN, pl, qtz, ro, rw, sa-IN, sat, sd, si, sid, sk, sl, sq, sr-Latn, sr, ss, st, sv, sw-TZ, ta, te, tg, th, tn, tr, ts, tt, ug, uk, uz, ve, vec, vi, xh, zu]
+        include:
+          - language: en-GB
+            flag: "🇬🇧"
+          - language: it
+            flag: "🇮🇹"
+          - language: ar
+            flag: "🇸🇦"
+          - language: zh-CN
+            flag: "🇨🇳"
+          - language: zh-TW
+            flag: "🇹🇼"
+          - language: fr
+            flag: "🇫🇷"
+          - language: de
+            flag: "🇩🇪"
+          - language: ja
+            flag: "🇯🇵"
+          - language: ko
+            flag: "🇰🇷"
+          - language: pt
+            flag: "🇵🇹"
+          - language: pt-BR
+            flag: "🇧🇷"
+          - language: es
+            flag: "🇪🇸"
+          - language: ru
+            flag: "🇷🇺"
+          - language: af
+            flag: "🇿🇦"
+          - language: am
+            flag: "🇪🇹"
+          - language: as
+            flag: "🇮🇳"
+          - language: ast
+            flag: "🇪🇸"
+          - language: be
+            flag: "🇧🇾"
+          - language: bg
+            flag: "🇧🇬"
+          - language: bn-IN
+            flag: "🇮🇳"
+          - language: bn
+            flag: "🇧🇩"
+          - language: bo
+            flag: "🇨🇳"
+          - language: br
+            flag: "🇫🇷"
+          - language: brx
+            flag: "🇮🇳"
+          - language: bs
+            flag: "🇧🇦"
+          - language: ca-valencia
+            flag: "🇪🇸"
+          - language: ca
+            flag: "🇪🇸"
+          - language: cs
+            flag: "🇨🇿"
+          - language: cy
+            flag: "🇬🇧"
+          - language: da
+            flag: "🇩🇰"
+          - language: dgo
+            flag: "🇮🇳"
+          - language: dz
+            flag: "🇧🇹"
+          - language: el
+            flag: "🇬🇷"
+          - language: en-ZA
+            flag: "🇿🇦"
+          - language: eo
+            flag: "🌍"
+          - language: et
+            flag: "🇪🇪"
+          - language: eu
+            flag: "🇪🇸"
+          - language: fa
+            flag: "🇮🇷"
+          - language: fi
+            flag: "🇫🇮"
+          - language: ga
+            flag: "🇮🇪"
+          - language: gd
+            flag: "🇬🇧"
+          - language: gl
+            flag: "🇪🇸"
+          - language: gu
+            flag: "🇮🇳"
+          - language: gug
+            flag: "🇵🇾"
+          - language: he
+            flag: "🇮🇱"
+          - language: hi
+            flag: "🇮🇳"
+          - language: hr
+            flag: "🇭🇷"
+          - language: hsb
+            flag: "🇩🇪"
+          - language: hu
+            flag: "🇭🇺"
+          - language: id
+            flag: "🇮🇩"
+          - language: is
+            flag: "🇮🇸"
+          - language: ka
+            flag: "🇬🇪"
+          - language: kk
+            flag: "🇰🇿"
+          - language: km
+            flag: "🇰🇭"
+          - language: kmr
+            flag: "🇹🇷"
+          - language: kn
+            flag: "🇮🇳"
+          - language: kok
+            flag: "🇮🇳"
+          - language: ks
+            flag: "🇮🇳"
+          - language: lb
+            flag: "🇱🇺"
+          - language: lo
+            flag: "🇱🇦"
+          - language: lt
+            flag: "🇱🇹"
+          - language: lv
+            flag: "🇱🇻"
+          - language: mai
+            flag: "🇮🇳"
+          - language: mk
+            flag: "🇲🇰"
+          - language: ml
+            flag: "🇮🇳"
+          - language: mn
+            flag: "🇲🇳"
+          - language: mni
+            flag: "🇮🇳"
+          - language: mr
+            flag: "🇮🇳"
+          - language: my
+            flag: "🇲🇲"
+          - language: nb
+            flag: "🇳🇴"
+          - language: ne
+            flag: "🇳🇵"
+          - language: nl
+            flag: "🇳🇱"
+          - language: nn
+            flag: "🇳🇴"
+          - language: nr
+            flag: "🇿🇦"
+          - language: nso
+            flag: "🇿🇦"
+          - language: oc
+            flag: "🇫🇷"
+          - language: om
+            flag: "🇪🇹"
+          - language: or
+            flag: "🇮🇳"
+          - language: pa-IN
+            flag: "🇮🇳"
+          - language: pl
+            flag: "🇵🇱"
+          - language: qtz
+            flag: "🇦🇺"
+          - language: ro
+            flag: "🇷🇴"
+          - language: rw
+            flag: "🇷🇼"
+          - language: sa-IN
+            flag: "🇮🇳"
+          - language: sat
+            flag: "🇮🇳"
+          - language: sd
+            flag: "🇵🇰"
+          - language: si
+            flag: "🇱🇰"
+          - language: sid
+            flag: "🇪🇹"
+          - language: sk
+            flag: "🇸🇰"
+          - language: sl
+            flag: "🇸🇮"
+          - language: sq
+            flag: "🇦🇱"
+          - language: sr-Latn
+            flag: "🇷🇸"
+          - language: sr
+            flag: "🇷🇸"
+          - language: ss
+            flag: "🇸🇿"
+          - language: st
+            flag: "🇿🇦"
+          - language: sv
+            flag: "🇸🇪"
+          - language: sw-TZ
+            flag: "🇹🇿"
+          - language: ta
+            flag: "🇮🇳"
+          - language: te
+            flag: "🇮🇳"
+          - language: tg
+            flag: "🇹🇯"
+          - language: th
+            flag: "🇹🇭"
+          - language: tn
+            flag: "🇧🇼"
+          - language: tr
+            flag: "🇹🇷"
+          - language: ts
+            flag: "🇿🇦"
+          - language: tt
+            flag: "🇷🇺"
+          - language: ug
+            flag: "🇨🇳"
+          - language: uk
+            flag: "🇺🇦"
+          - language: uz
+            flag: "🇺🇿"
+          - language: ve
+            flag: "🇿🇦"
+          - language: vec
+            flag: "🇮🇹"
+          - language: vi
+            flag: "🇻🇳"
+          - language: xh
+            flag: "🇿🇦"
+          - language: zu
+            flag: "🇿🇦"
 
     steps:
     - uses: actions/checkout@v6
