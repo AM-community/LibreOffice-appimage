@@ -25,8 +25,11 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - name: Setup apt cache folder
-        run: mkdir -p "$HOME/.cache/apt/archives"
+      - name: Setup directories
+        run: |
+          mkdir -p "$HOME/.cache/apt/archives"
+          mkdir -p "${{ env.LIBREOFFICE_DEB_DIR }}"
+          mkdir -p "${{ env.STAGING_DIR }}"
 
       - name: Cache apt packages
         id: apt-cache
@@ -45,23 +48,22 @@ jobs:
 
       - name: Download AppImageTool
         run: |
-          URL="https://github.com/AppImage/appimagetool/releases/download/continuous/${APPIMAGETOOL_NAME}"
-          wget --tries=5 --waitretry=3 -c "$URL" -O "$APPIMAGETOOL_NAME"
-          chmod +x "$APPIMAGETOOL_NAME"
+          URL="https://github.com/AppImage/appimagetool/releases/download/continuous/${{ env.APPIMAGETOOL_NAME }}"
+          wget --tries=5 --waitretry=3 -c "$URL" -O "${{ env.APPIMAGETOOL_NAME }}"
+          chmod +x "${{ env.APPIMAGETOOL_NAME }}"
 
       - name: Download LibreOffice debs
         run: |
-          mkdir -p $LIBREOFFICE_DEB_DIR
-          ./make_libreoffice_appimage fresh x86-64 download-only $LIBREOFFICE_DEB_DIR
-          ls -lh $LIBREOFFICE_DEB_DIR
+          ./make_libreoffice_appimage fresh x86-64 download-only "${{ env.LIBREOFFICE_DEB_DIR }}"
+          ls -lh "${{ env.LIBREOFFICE_DEB_DIR }}"
 
-      - name: Upload artifacts
+      - name: Upload build-tools artifacts
         uses: actions/upload-artifact@v7
         with:
           name: build-tools
           path: |
-            $APPIMAGETOOL_NAME
-            $LIBREOFFICE_DEB_DIR
+            ${{ env.APPIMAGETOOL_NAME }}
+            ${{ env.LIBREOFFICE_DEB_DIR }}
 
   build:
     needs: prepare
@@ -95,19 +97,19 @@ jobs:
         id: staging-cache
         uses: actions/cache@v4
         with:
-          path: $STAGING_DIR
+          path: ${{ env.STAGING_DIR }}
           key: libreoffice-staging-${{ matrix.language }}-${{ matrix.variant }}-${{ hashFiles('**/make_libreoffice_appimage') }}
           restore-keys: libreoffice-staging-
 
       - name: Build AppImage
         run: |
           chmod +x ./make_libreoffice_appimage
-          chmod +x ./${APPIMAGETOOL_NAME}
-          ln -sf ./${APPIMAGETOOL_NAME} ./appimagetool
+          chmod +x ./${{ env.APPIMAGETOOL_NAME }}
+          ln -sf ./${{ env.APPIMAGETOOL_NAME }} ./appimagetool
           export PATH="$PWD:$PATH"
-          ./make_libreoffice_appimage fresh x86-64 "${{ matrix.language }}" "${{ matrix.variant }}" Y Y Y $LIBREOFFICE_DEB_DIR $STAGING_DIR
+          ./make_libreoffice_appimage fresh x86-64 "${{ matrix.language }}" "${{ matrix.variant }}" Y Y Y ${{ env.LIBREOFFICE_DEB_DIR }} ${{ env.STAGING_DIR }}
 
-      - name: Upload artifact (per job)
+      - name: Upload AppImage artifact (per job)
         uses: actions/upload-artifact@v7
         with:
           name: AppImage-${{ matrix.language }}-${{ matrix.variant }}-${{ github.run_id }}
@@ -131,7 +133,7 @@ jobs:
             mv -n "$f" "dist/${{ github.run_id }}-${bn}" || echo "skipped $f"
           ' \;
 
-      - name: get snapshot date
+      - name: Get snapshot date
         id: snapshot
         run: |
           SNAPSHOT_TAG="$(date --utc +'%Y%m%d-%H%M%S')"
