@@ -5,151 +5,86 @@ on:
     - cron: "0 18 * * 0"
   workflow_dispatch:
 
-concurrency:
-  group: build-${{ github.ref_name || github.ref }}
-  cancel-in-progress: true
-
-permissions:
-  contents: read
-  packages: write
-  id-token: write
-
 env:
   APPIMAGETOOL_NAME: appimagetool-x86_64.AppImage
-  LIBREOFFICE_DEB_DIR: libreoffice-debs
-  STAGING_DIR: libreoffice-staging
 
 jobs:
-  prepare:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-
-      - name: Setup directories
-        run: |
-          mkdir -p "$HOME/.cache/apt/archives"
-          mkdir -p "${{ env.LIBREOFFICE_DEB_DIR }}"
-          mkdir -p "${{ env.STAGING_DIR }}"
-
-      - name: Cache apt packages
-        id: apt-cache
-        uses: actions/cache@v5
-        with:
-          path: $HOME/.cache/apt
-          key: apt-cache-${{ runner.os }}-${{ hashFiles('**/make_libreoffice_appimage') }}
-          restore-keys: apt-cache-${{ runner.os }}-
-
-      - name: Minimal system setup
-        run: |
-          sudo apt update
-          sudo apt install -y --no-install-recommends desktop-file-utils
-          sudo sysctl -w kernel.apparmor_restrict_unprivileged_unconfined=0
-          sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
-
-      - name: Download AppImageTool
-        run: |
-          URL="https://github.com/AppImage/appimagetool/releases/download/continuous/${{ env.APPIMAGETOOL_NAME }}"
-          wget --tries=5 --waitretry=3 -c "$URL" -O "${{ env.APPIMAGETOOL_NAME }}"
-          chmod +x "${{ env.APPIMAGETOOL_NAME }}"
-
-      - name: Download LibreOffice debs
-        run: |
-          ./make_libreoffice_appimage fresh x86-64 "${{ matrix.language }}" "${{ matrix.help }}" Y Y "${{ matrix.portable }}"
-          ls -lh "${{ env.LIBREOFFICE_DEB_DIR }}"
-
-      - name: Upload build-tools artifacts
-        uses: actions/upload-artifact@v7
-        with:
-          name: build-tools
-          path: |
-            ${{ env.APPIMAGETOOL_NAME }}
-            ${{ env.LIBREOFFICE_DEB_DIR }}
-
   build:
-    needs: prepare
+    name: Build ${{ matrix.language }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       max-parallel: 8
       matrix:
-        language: [
-          en-GB, it, standard, full
-        ]
-        variant: [N, Y]
+        language: [en-GB, it, ar, zh-CN, zh-TW, fr, de, ja, ko, pt, pt-BR, es, ru, af, am, as, ast, be, bg, bn-IN, bn, bo, br, brx, bs, ca-valencia, ca, cs, cy, da, dgo, dz, el, en-ZA, eo, et, eu, fa, fi, ga, gd, gl, gu, gug, he, hi, hr, hsb, hu, id, is, ka, kk, km, kmr, kn, kok, ks, lb, lo, lt, lv, mai, mk, ml, mn, mni, mr, my, nb, ne, nl, nn, nr, nso, oc, om, or, pa-IN, pl, qtz, ro, rw, sa-IN, sat, sd, si, sid, sk, sl, sq, sr-Latn, sr, ss, st, sv, sw-TZ, ta, te, tg, th, tn, tr, ts, tt, ug, uk, uz, ve, vec, vi, xh, zu]
 
     steps:
-      - uses: actions/checkout@v6
+    - uses: actions/checkout@v6
 
-      - name: Download build-tools artifacts
-        uses: actions/download-artifact@v8
-        with:
-          name: build-tools
-          path: .
+    - name: build
+      run: |
+        sudo apt update && sudo apt install desktop-file-utils
+        sudo sysctl -w kernel.apparmor_restrict_unprivileged_unconfined=0
+        sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
 
-      - name: Restore apt cache
-        uses: actions/cache@v5
-        with:
-          path: $HOME/.cache/apt
-          key: apt-cache-${{ runner.os }}-${{ hashFiles('**/make_libreoffice_appimage') }}
-          restore-keys: apt-cache-${{ runner.os }}-
+        URL="https://github.com/AppImage/appimagetool/releases/download/continuous/${{ env.APPIMAGETOOL_NAME }}"
+        wget -c "$URL" -O appimagetool && chmod a+x ./appimagetool
+        export PATH="$PWD":"${PATH}"
+        
+        chmod a+x ./make_libreoffice_appimage
+        
+        # Build both N and Y variants
+        ./make_libreoffice_appimage fresh x86-64 "${{ matrix.language }}" N Y Y Y
+        ./make_libreoffice_appimage fresh x86-64 "${{ matrix.language }}" Y Y Y Y
+        
+        mkdir -p dist
+        find . -type d -name out
+        mv ./*/*AppImage* dist/
 
-      - name: Cache LibreOffice staging
-        id: staging-cache
-        uses: actions/cache@v4
-        with:
-          path: ${{ env.STAGING_DIR }}
-          key: libreoffice-staging-${{ matrix.language }}-${{ matrix.variant }}-${{ hashFiles('**/make_libreoffice_appimage') }}
-          restore-keys: libreoffice-staging-
-
-      - name: Build AppImage
-        run: |
-          chmod +x ./make_libreoffice_appimage
-          chmod +x ./${{ env.APPIMAGETOOL_NAME }}
-          ln -sf ./${{ env.APPIMAGETOOL_NAME }} ./appimagetool
-          export PATH="$PWD:$PATH"
-          ./make_libreoffice_appimage fresh x86-64 "${{ matrix.language }}" "${{ matrix.variant }}" Y Y Y ${{ env.LIBREOFFICE_DEB_DIR }} ${{ env.STAGING_DIR }}
-
-      - name: Upload AppImage artifact (per job)
-        uses: actions/upload-artifact@v7
-        with:
-          name: AppImage-${{ matrix.language }}-${{ matrix.variant }}-${{ github.run_id }}
-          path: "./*/*AppImage*"
+    - name: Upload artifact
+      uses: actions/upload-artifact@v7
+      with:
+        name: AppImage-${{ matrix.language }}
+        path: 'dist'
 
   release:
-    needs: build
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - name: Download all artifacts
-        uses: actions/download-artifact@v8
+      needs: [build]
+      permissions: write-all
+      runs-on: ubuntu-latest
 
-      - name: Merge artifacts
-        run: |
-          mkdir -p dist
-          find . -name "*AppImage*" -exec bash -c '
-            f="{}"
-            bn="$(basename "$f")"
-            mv -n "$f" "dist/${{ github.run_id }}-${bn}" || echo "skipped $f"
-          ' \;
+      steps:
+        - uses: actions/download-artifact@v8
+          with:
+            path: .
+            merge-multiple: true
 
-      - name: Get snapshot date
-        id: snapshot
-        run: |
-          SNAPSHOT_TAG="$(date --utc +'%Y%m%d-%H%M%S')"
-          echo "SNAPSHOT_TAG=$SNAPSHOT_TAG" >> "$GITHUB_ENV"
+        # Snapshot Release
+        - name: get date
+          run: |
+            SNAPSHOT_TAG="$(date --utc +'%Y%m%d-%H%M%S')"
+            echo SNAPSHOT_TAG="${SNAPSHOT_TAG}" >> "${GITHUB_ENV}"
+          continue-on-error: false
+        - name: create snapshot
+          uses: softprops/action-gh-release@v2
+          with:
+            name: "Snapshot FRESH ${{ env.SNAPSHOT_TAG}}"
+            tag_name: "${{ env.SNAPSHOT_TAG}}"
+            prerelease: false
+            draft: false
+            generate_release_notes: false
+            make_latest: false
+            files: |
+              *.AppImage*
+          continue-on-error: false
 
-      - name: Create snapshot release
-        uses: softprops/action-gh-release@v2
-        with:
-          name: "Snapshot FRESH $SNAPSHOT_TAG"
-          tag_name: $SNAPSHOT_TAG
-          files: dist/*
-
-      - name: Continuous release
-        uses: marvinpinto/action-automatic-releases@latest
-        with:
-          title: LibreOffice FRESH
-          automatic_release_tag: continuous-fresh
-          files: dist/*
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
+        # Continuous release
+        - name: release
+          uses: marvinpinto/action-automatic-releases@latest
+          with:
+            title: LibreOffice FRESH
+            automatic_release_tag: continuous-fresh
+            prerelease: false
+            draft: false
+            files: |
+              *.AppImage*
+            repo_token: ${{ secrets.GITHUB_TOKEN }}
