@@ -1,0 +1,328 @@
+name: LibreOffice CI
+
+on:
+  schedule:
+    - cron: "0 18 * * 0"  # Fresh at 18:00 Sundays
+    - cron: "0 6 * * 0"   # Still at 06:00 Sundays
+  workflow_dispatch:
+    inputs:
+      channel:
+        description: 'Channel to build'
+        type: choice
+        options:
+          - fresh
+          - still
+          - both
+        default: fresh
+      languages1:
+        description: 'Language(s) to build (dropdown)'
+        type: choice
+        options:
+          - ""
+          - ALL
+          - STANDARD
+          - en-GB
+          - it
+          - de
+          - fr
+          - es
+          - ja
+          - zh-CN
+          - zh-TW
+          - pt
+          - pt-BR
+          - ru
+          - ar
+          - ko
+          - standard
+          - full
+        required: false
+      languages2:
+        description: 'Or enter languages manually (e.g., "en-GB,it,de" or "ALL")'
+        type: string
+        required: false
+      help:
+        description: 'Include offline help'
+        type: choice
+        options:
+          - yes
+          - no
+        default: yes
+  repository_dispatch:
+    types: [build-lo]
+  push:
+    branches:
+      - master
+    paths:
+      - '.github/workflows/CI.yml'
+
+env:
+  APPIMAGETOOL_NAME: appimagetool-x86_64.AppImage
+
+jobs:
+  # Download/cache job for Fresh channel
+  cache-FRESH:
+    name: Download packages (Fresh)
+    runs-on: ubuntu-latest
+    outputs:
+      cache_key: ${{ steps.cache.outputs.cache_key }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Download packages (Fresh)
+        id: cache
+        run: |
+          sudo apt update && sudo apt install -y desktop-file-utils
+          sudo sysctl -w kernel.apparmor_restrict_unprivileged_unconfined=0
+          sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+
+          URL="https://github.com/AppImage/appimagetool/releases/download/continuous/${{ env.APPIMAGETOOL_NAME }}"
+          wget -c "$URL" -O appimagetool && chmod a+x ./appimagetool
+          export PATH="$PWD":"${PATH}"
+
+          chmod a+x ./make_libreoffice_appimage
+
+          HELP_PARAM="Y"
+          if [[ "${{ github.event.inputs.help }}" == "no" ]]; then
+            HELP_PARAM="N"
+          elif [[ "${{ github.event.inputs.help }}" != "yes" ]]; then
+            # Default for scheduled runs is yes
+            HELP_PARAM="Y"
+          fi
+
+          # Build full with help to cache packages
+          echo "cache_key=Fresh-$(date +%Y%m%d)" >> $GITHUB_OUTPUT
+          ./make_libreoffice_appimage fresh x86-64 "full" N $HELP_PARAM Y Y
+          ./make_libreoffice_appimage fresh x86-64 "full" Y $HELP_PARAM Y Y
+
+      - name: Upload cache
+        uses: actions/upload-artifact@v7
+        with:
+          name: cache-FRESH
+          path: |
+            ./*
+            !.git
+          retention-days: 1
+
+  # Download/cache job for Still channel
+  cache-STILL:
+    name: Download packages (Still)
+    runs-on: ubuntu-latest
+    outputs:
+      cache_key: ${{ steps.cache.outputs.cache_key }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Download packages (Still)
+        id: cache
+        run: |
+          sudo apt update && sudo apt install -y desktop-file-utils
+          sudo sysctl -w kernel.apparmor_restrict_unprivileged_unconfined=0
+          sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+
+          URL="https://github.com/AppImage/appimagetool/releases/download/continuous/${{ env.APPIMAGETOOL_NAME }}"
+          wget -c "$URL" -O appimagetool && chmod a+x ./appimagetool
+          export PATH="$PWD":"${PATH}"
+
+          chmod a+x ./make_libreoffice_appimage
+
+          HELP_PARAM="Y"
+          if [[ "${{ github.event.inputs.help }}" == "no" ]]; then
+            HELP_PARAM="N"
+          elif [[ "${{ github.event.inputs.help }}" != "yes" ]]; then
+            HELP_PARAM="Y"
+          fi
+
+          # Build full with help to cache packages
+          echo "cache_key=Still-$(date +%Y%m%d)" >> $GITHUB_OUTPUT
+          ./make_libreoffice_appimage still x86-64 "full" N $HELP_PARAM Y Y
+          ./make_libreoffice_appimage still x86-64 "full" Y $HELP_PARAM Y Y
+
+      - name: Upload cache
+        uses: actions/upload-artifact@v7
+        with:
+          name: cache-STILL
+          path: |
+            ./*
+            !.git
+          retention-days: 1
+
+  # Fresh build jobs
+  build-fresh:
+    needs: cache-FRESH
+    permissions:
+      contents: write
+    name: ${{ matrix.flag }} ${{ matrix.language }} (Fresh)
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      max-parallel: 8
+      matrix:
+        include:
+          - language: en-GB
+            flag: "🇬🇧"
+          - language: it
+            flag: "🇮🇹"
+          - language: de
+            flag: "🇩🇪"
+          - language: fr
+            flag: "🇫🇷"
+          - language: es
+            flag: "🇪🇸"
+          - language: ja
+            flag: "🇯🇵"
+          - language: zh-CN
+            flag: "🇨🇳"
+          - language: zh-TW
+            flag: "🇹🇼"
+          - language: pt
+            flag: "🇵🇹"
+          - language: pt-BR
+            flag: "🇧🇷"
+          - language: ru
+            flag: "🇷🇺"
+          - language: ar
+            flag: "🇸🇦"
+          - language: ko
+            flag: "🇰🇷"
+          - language: standard
+            flag: "🌐"
+          - language: full
+            flag: "🌍"
+    steps:
+      - uses: actions/download-artifact@v7
+        with:
+          name: cache-FRESH
+          path: .
+
+      - name: Build and rename AppImages (Fresh)
+        run: |
+          chmod a+x ./make_libreoffice_appimage
+
+          HELP_PARAM="Y"
+          if [[ "${{ github.event.inputs.help }}" == "no" ]]; then
+            HELP_PARAM="N"
+          elif [[ "${{ github.event.inputs.help }}" != "yes" ]]; then
+            HELP_PARAM="Y"
+          fi
+
+          # Build both N and Y variants using cached packages
+          ./make_libreoffice_appimage fresh x86-64 "${{ matrix.language }}" N $HELP_PARAM Y Y
+          ./make_libreoffice_appimage fresh x86-64 "${{ matrix.language }}" Y $HELP_PARAM Y Y
+
+          # Rename and move to dist/
+          mkdir -p dist
+          for f in ./*/*AppImage*; do
+            base=$(basename "$f")
+            mv "$f" "dist/LibreOffice-${{ matrix.language }}-${base}"
+          done
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: AppImage-Fresh-${{ matrix.language }}
+          path: 'dist'
+
+      - name: Release (append to single release)
+        run: |
+          TAG="continuous-fresh"
+          NAME="LibreOffice FRESH"
+
+          gh release create "$TAG" \
+            --title "$NAME" \
+            --notes "" \
+            --latest=false 2>/dev/null || true
+
+          gh release upload "$TAG" dist/*.AppImage* --clobber
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # Still build jobs
+  build-still:
+    needs: cache-STILL
+    permissions:
+      contents: write
+    name: ${{ matrix.flag }} ${{ matrix.language }} (Still)
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      max-parallel: 8
+      matrix:
+        include:
+          - language: en-GB
+            flag: "🇬🇧"
+          - language: it
+            flag: "🇮🇹"
+          - language: de
+            flag: "🇩🇪"
+          - language: fr
+            flag: "🇫🇷"
+          - language: es
+            flag: "🇪🇸"
+          - language: ja
+            flag: "🇯🇵"
+          - language: zh-CN
+            flag: "🇨🇳"
+          - language: zh-TW
+            flag: "🇹🇼"
+          - language: pt
+            flag: "🇵🇹"
+          - language: pt-BR
+            flag: "🇧🇷"
+          - language: ru
+            flag: "🇷🇺"
+          - language: ar
+            flag: "🇸🇦"
+          - language: ko
+            flag: "🇰🇷"
+          - language: standard
+            flag: "🌐"
+          - language: full
+            flag: "🌍"
+    steps:
+      - uses: actions/download-artifact@v7
+        with:
+          name: cache-STILL
+          path: .
+
+      - name: Build and rename AppImages (Still)
+        run: |
+          chmod a+x ./make_libreoffice_appimage
+
+          HELP_PARAM="Y"
+          if [[ "${{ github.event.inputs.help }}" == "no" ]]; then
+            HELP_PARAM="N"
+          elif [[ "${{ github.event.inputs.help }}" != "yes" ]]; then
+            HELP_PARAM="Y"
+          fi
+
+          # Build both N and Y variants using cached packages
+          ./make_libreoffice_appimage still x86-64 "${{ matrix.language }}" N $HELP_PARAM Y Y
+          ./make_libreoffice_appimage still x86-64 "${{ matrix.language }}" Y $HELP_PARAM Y Y
+
+          # Rename and move to dist/
+          mkdir -p dist
+          for f in ./*/*AppImage*; do
+            base=$(basename "$f")
+            mv "$f" "dist/LibreOffice-${{ matrix.language }}-${base}"
+          done
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: AppImage-Still-${{ matrix.language }}
+          path: 'dist'
+
+      - name: Release (append to single release)
+        run: |
+          TAG="continuous-still"
+          NAME="LibreOffice STILL"
+
+          gh release create "$TAG" \
+            --title "$NAME" \
+            --notes "" \
+            --latest=false 2>/dev/null || true
+
+          gh release upload "$TAG" dist/*.AppImage* --clobber
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
