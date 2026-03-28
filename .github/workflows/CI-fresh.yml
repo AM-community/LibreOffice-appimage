@@ -10,6 +10,7 @@ on:
 
 env:
   APPIMAGETOOL_NAME: appimagetool-x86_64.AppImage
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
   build:
