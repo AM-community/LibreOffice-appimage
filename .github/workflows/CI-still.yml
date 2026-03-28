@@ -45,7 +45,7 @@ jobs:
           - language: standard
             flag: "🌐"
           - language: full
-            flag: "🌐"
+            flag: "🌍"
 
     steps:
     - uses: actions/checkout@v6
