@@ -6,13 +6,12 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: build-${{ github.ref_name || github.ref }}
+  group: build-${{ (github.ref_name || github.ref) && (github.ref_name || github.ref) | replace('/', '-') }}
   cancel-in-progress: true
 
 permissions:
   contents: read
   packages: write
-  id-token: write
 
 env:
   APPIMAGETOOL_NAME: appimagetool-x86_64.AppImage
@@ -24,7 +23,8 @@ jobs:
       - uses: actions/checkout@v6
 
       - name: Setup apt cache folder
-        run: mkdir -p "$HOME/.cache/apt/archives"
+        run: |
+          mkdir -p "$HOME/.cache/apt/archives"
 
       - name: Cache apt packages
         id: cache
@@ -36,9 +36,10 @@ jobs:
 
       - name: Download appimagetool
         run: |
+          set -euo pipefail
           URL="https://github.com/AppImage/appimagetool/releases/download/continuous/${APPIMAGETOOL_NAME}"
-          wget --tries=5 --waitretry=3 -c "$URL" -O "$APPIMAGETOOL_NAME"
-          chmod +x "$APPIMAGETOOL_NAME"
+          wget --tries=5 --waitretry=3 -c "$URL" -O "${APPIMAGETOOL_NAME}"
+          chmod +x "${APPIMAGETOOL_NAME}"
 
       - name: Upload appimagetool artifact
         uses: actions/upload-artifact@v4
@@ -67,7 +68,21 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: appimagetool
-          path: .
+          path: ./appimagetool-dir
+
+      - name: Ensure appimagetool present and executable
+        run: |
+          set -euo pipefail
+          TOOL="./appimagetool-dir/${APPIMAGETOOL_NAME}"
+          if [ ! -f "$TOOL" ]; then
+            echo "ERROR: appimagetool missing at $TOOL" >&2
+            ls -la ./appimagetool-dir || true
+            exit 1
+          fi
+          chmod +x "$TOOL"
+          echo "APPIMAGETOOL_PATH=$TOOL" >> $GITHUB_ENV
+          echo "Added appimagetool-dir to PATH"
+          echo "$PWD/appimagetool-dir" >> $GITHUB_PATH
 
       - name: Restore apt cache (best-effort)
         uses: actions/cache@v4
@@ -78,8 +93,10 @@ jobs:
 
       - name: Minimal system setup
         run: |
-          sudo apt update --yes || true
-          sudo apt install -y --no-install-recommends desktop-file-utils || true
+          set -euo pipefail
+          sudo apt-get update --yes || true
+          sudo apt-get install -y --no-install-recommends desktop-file-utils || true
+          # Only attempt sysctl changes if apparmor keys exist
           if sudo sysctl -a 2>/dev/null | grep -q apparmor; then
             sudo sysctl -w kernel.apparmor_restrict_unprivileged_unconfined=0 || true
             sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0 || true
@@ -87,8 +104,14 @@ jobs:
 
       - name: Build AppImage
         run: |
-          chmod +x ./make_libreoffice_appimage
-          chmod +x ./${APPIMAGETOOL_NAME}
+          set -euo pipefail
+          if [ ! -f ./make_libreoffice_appimage ]; then
+            echo "ERROR: make_libreoffice_appimage script missing" >&2
+            ls -la || true
+            exit 2
+          fi
+          chmod +x ./make_libreoffice_appimage || true
+          # ensure appimagetool in PATH (added earlier) or use explicit path $APPIMAGETOOL_PATH
           ./make_libreoffice_appimage fresh x86-64 "${{ matrix.language }}" "${{ matrix.variant }}" Y Y Y
 
       - name: Upload artifact (per job)
@@ -108,12 +131,18 @@ jobs:
 
       - name: Merge artifacts
         run: |
+          set -euo pipefail
           mkdir -p dist
-          find . -name "*AppImage*" -exec bash -c '
-            f="{}"
+          find . -name "*AppImage*" -print0 | while IFS= read -r -d '' f; do
             bn="$(basename "$f")"
-            mv -n "$f" "dist/${{ github.run_id }}-${bn}" || echo "skipped $f"
-          ' \;
+            dest="dist/${{ github.run_id }}-${bn}"
+            if [ -e "$dest" ]; then
+              echo "skipping existing $dest"
+            else
+              mv "$f" "$dest" || echo "mv failed for $f"
+            fi
+          done
+          ls -la dist || true
 
       - name: get snapshot date
         id: snapshot
