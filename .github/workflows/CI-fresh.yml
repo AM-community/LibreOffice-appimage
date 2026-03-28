@@ -23,7 +23,7 @@ jobs:
   prepare:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
 
       - name: Setup directories
         run: |
@@ -33,7 +33,7 @@ jobs:
 
       - name: Cache apt packages
         id: apt-cache
-        uses: actions/cache@v5
+        uses: actions/cache@v4
         with:
           path: $HOME/.cache/apt
           key: apt-cache-${{ runner.os }}-${{ hashFiles('**/make_libreoffice_appimage') }}
@@ -72,13 +72,11 @@ jobs:
       fail-fast: false
       max-parallel: 8
       matrix:
-        language: [
-          en-GB, it, standard, full
-        ]
-        variant: [N, Y]
+        language: [en-GB]
+        variant: [N]
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
 
       - name: Download build-tools artifacts
         uses: actions/download-artifact@v8
@@ -87,7 +85,7 @@ jobs:
           path: .
 
       - name: Restore apt cache
-        uses: actions/cache@v5
+        uses: actions/cache@v4
         with:
           path: $HOME/.cache/apt
           key: apt-cache-${{ runner.os }}-${{ hashFiles('**/make_libreoffice_appimage') }}
