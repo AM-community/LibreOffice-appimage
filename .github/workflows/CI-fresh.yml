@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: build-${{ (github.ref_name || github.ref) && (github.ref_name || github.ref) | replace('/', '-') }}
+  group: build-${{ github.ref_name || github.ref }}
   cancel-in-progress: true
 
 permissions:
