@@ -54,7 +54,7 @@ jobs:
 
       - name: Download LibreOffice debs
         run: |
-          ./make_libreoffice_appimage fresh x86-64 download-only "${{ env.LIBREOFFICE_DEB_DIR }}"
+          ./make_libreoffice_appimage fresh x86-64 "${{ matrix.language }}" "${{ matrix.help }}" Y Y "${{ matrix.portable }}"
           ls -lh "${{ env.LIBREOFFICE_DEB_DIR }}"
 
       - name: Upload build-tools artifacts
