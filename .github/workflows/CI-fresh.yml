@@ -16,6 +16,8 @@ permissions:
 
 env:
   APPIMAGETOOL_NAME: appimagetool-x86_64.AppImage
+  LIBREOFFICE_DEB_DIR: libreoffice-debs
+  STAGING_DIR: libreoffice-staging
 
 jobs:
   prepare:
@@ -27,24 +29,39 @@ jobs:
         run: mkdir -p "$HOME/.cache/apt/archives"
 
       - name: Cache apt packages
-        id: cache
+        id: apt-cache
         uses: actions/cache@v5
         with:
           path: $HOME/.cache/apt
           key: apt-cache-${{ runner.os }}-${{ hashFiles('**/make_libreoffice_appimage') }}
           restore-keys: apt-cache-${{ runner.os }}-
 
-      - name: Download appimagetool
+      - name: Minimal system setup
+        run: |
+          sudo apt update
+          sudo apt install -y --no-install-recommends desktop-file-utils
+          sudo sysctl -w kernel.apparmor_restrict_unprivileged_unconfined=0
+          sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+
+      - name: Download AppImageTool
         run: |
           URL="https://github.com/AppImage/appimagetool/releases/download/continuous/${APPIMAGETOOL_NAME}"
           wget --tries=5 --waitretry=3 -c "$URL" -O "$APPIMAGETOOL_NAME"
           chmod +x "$APPIMAGETOOL_NAME"
 
-      - name: Upload appimagetool artifact
+      - name: Download LibreOffice debs
+        run: |
+          mkdir -p $LIBREOFFICE_DEB_DIR
+          ./make_libreoffice_appimage fresh x86-64 download-only $LIBREOFFICE_DEB_DIR
+          ls -lh $LIBREOFFICE_DEB_DIR
+
+      - name: Upload artifacts
         uses: actions/upload-artifact@v7
         with:
-          name: appimagetool
-          path: ${{ env.APPIMAGETOOL_NAME }}
+          name: build-tools
+          path: |
+            $APPIMAGETOOL_NAME
+            $LIBREOFFICE_DEB_DIR
 
   build:
     needs: prepare
@@ -61,10 +78,10 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - name: Download shared appimagetool
+      - name: Download build-tools artifacts
         uses: actions/download-artifact@v8
         with:
-          name: appimagetool
+          name: build-tools
           path: .
 
       - name: Restore apt cache
@@ -74,12 +91,13 @@ jobs:
           key: apt-cache-${{ runner.os }}-${{ hashFiles('**/make_libreoffice_appimage') }}
           restore-keys: apt-cache-${{ runner.os }}-
 
-      - name: Minimal system setup
-        run: |
-          sudo apt update
-          sudo apt install -y --no-install-recommends desktop-file-utils
-          sudo sysctl -w kernel.apparmor_restrict_unprivileged_unconfined=0
-          sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+      - name: Cache LibreOffice staging
+        id: staging-cache
+        uses: actions/cache@v4
+        with:
+          path: $STAGING_DIR
+          key: libreoffice-staging-${{ matrix.language }}-${{ matrix.variant }}-${{ hashFiles('**/make_libreoffice_appimage') }}
+          restore-keys: libreoffice-staging-
 
       - name: Build AppImage
         run: |
@@ -87,7 +105,7 @@ jobs:
           chmod +x ./${APPIMAGETOOL_NAME}
           ln -sf ./${APPIMAGETOOL_NAME} ./appimagetool
           export PATH="$PWD:$PATH"
-          ./make_libreoffice_appimage fresh x86-64 "${{ matrix.language }}" "${{ matrix.variant }}" Y Y Y
+          ./make_libreoffice_appimage fresh x86-64 "${{ matrix.language }}" "${{ matrix.variant }}" Y Y Y $LIBREOFFICE_DEB_DIR $STAGING_DIR
 
       - name: Upload artifact (per job)
         uses: actions/upload-artifact@v7
