@@ -18,6 +18,8 @@ env:
   APPIMAGETOOL_NAME: appimagetool-x86_64.AppImage
   LIBREOFFICE_DEB_DIR: libreoffice-debs
   STAGING_DIR: libreoffice-staging
+  ACTIONS_RUNNER_DEBUG: true
+  ACTIONS_STEP_DEBUG: true
 
 jobs:
   prepare:
