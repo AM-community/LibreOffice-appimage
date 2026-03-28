@@ -31,14 +31,6 @@ jobs:
           mkdir -p "${{ env.LIBREOFFICE_DEB_DIR }}"
           mkdir -p "${{ env.STAGING_DIR }}"
 
-      - name: Cache apt packages
-        id: apt-cache
-        uses: actions/cache@v4
-        with:
-          path: /var/cache/apt
-          key: apt-cache-${{ runner.os }}-${{ hashFiles('**/make_libreoffice_appimage') }}
-          restore-keys: apt-cache-${{ runner.os }}-
-
       - name: Minimal system setup
         run: |
           sudo apt update
@@ -83,13 +75,6 @@ jobs:
         with:
           name: build-tools
           path: .
-
-      - name: Restore apt cache
-        uses: actions/cache@v4
-        with:
-          path: /var/cache/apt
-          key: apt-cache-${{ runner.os }}-${{ hashFiles('**/make_libreoffice_appimage') }}
-          restore-keys: apt-cache-${{ runner.os }}-
 
       - name: Cache LibreOffice staging
         id: staging-cache
