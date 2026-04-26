@@ -263,8 +263,15 @@ jobs:
         sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
 
         URL="https://github.com/AppImage/appimagetool/releases/download/continuous/${{ env.APPIMAGETOOL_NAME }}"
-        wget -c "$URL" -O appimagetool && chmod a+x ./appimagetool
-        export PATH="$PWD":"${PATH}"
+        wget -c "$URL" -O appimagetool \
+         --tries=3 \
+         --timeout=30 \
+         --waitretry=5 \
+         --retry-connrefused \
+         || exit 1
+        chmod a+x appimagetool
+
+        export PATH="$PWD:$PATH"
 
         chmod a+x ./make_libreoffice_appimage
 
@@ -274,6 +281,8 @@ jobs:
 
         # Rename and move to dist/
         mkdir -p dist
+        shopt -s nullglob
+
         for f in ./*/*AppImage*; do
           base=$(basename "$f")
           mv "$f" "dist/LibreOffice-${{ matrix.language }}-${base}"
